@@ -1,0 +1,55 @@
+firstbyte.1
+
+0.5 out of 1 for the .TH line
+1 out of 1 for correct use of standard man page section headings and structural macros
+0.5 out of 1 for quality of the NAME section contents
+0.75 out of 1 for SYNOPSIS value (including font changes)
+0.75 out of 1 for DESCRIPTION section
+"SEE ALSO" not clearly required, hence not graded.
+1 out of 1 for overall quality of file (except for any matters penalized above): spelling, clarity, appropriate use of fonts and nroff/troff, no blank lines (they are meaningful in nroff), use standard section headings and macros, no incorrect or useless or empty sections, any other issues.
+Total:
+
+Your firstbyte.1 grade: 4.5 out of 6 (75%). Class average was 3.83 out of 6 (64%).
+
+Please remember that the grader has a limited amount of time to read your assignment. Just because something isn't commented upon doesn't mean that it is necessarily okay!
+
+One or more grader comments appear below (you can search for the string "Grader")
+
+firstbyte.1
+
+
+   1  .TH FIRSTBYTE 4 "25 January 2016"
+Grader says: wrong volume
+
+   2  .SH NAME 
+   3  firstbyte - display the decimal of a character
+Grader says: not very explanatory
+
+   4  .SH SYNOPSIS 
+   5  .B cat [FILE]
+Grader says: wrong command; wrong font
+
+   6  .SH DESCRIPTION 
+   7  Display the first character of standard input, or FILE, as a decimal in standard 
+output.
+Grader says: output, not display
+firstbyte.1, formatted
+
+
+FIRSTBYTE(4)                                                      FIRSTBYTE(4) 
+
+
+
+NAME 
+       firstbyte - display the decimal of a character 
+
+SYNOPSIS 
+       cat [FILE] 
+
+DESCRIPTION 
+       Display the first character of standard input, or FILE, as a decimal in 
+       standard output. 
+
+
+
+                                25 January 2016                   FIRSTBYTE(4)
