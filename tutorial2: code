@@ -1,0 +1,7 @@
+tut2:
+
+    lynx -source http://www.thinkbabynames.com/random/1 | tr -cs /0-9A-Za-z '\012' | grep -m1 meaning/1 | sed 's;.*/;;' 
+Testing with "sh tut2": 
+Output to stdout:
+    Harding
+Grade for tut2 is 1 out of 1.
