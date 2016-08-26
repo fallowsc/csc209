@@ -1,0 +1,567 @@
+CSC 209 exam review exercises, week of 4 April 2016
+
+We don't have a tutorial this week, but if you're looking for something to do, here are some exercises which might make a good review leading up to the final exam.
+Here are some problems from former exams. You can work on them by yourself or in groups of any size, as this tutorial is not graded.
+
+If you write your programs in text files on the computer, your goal should be that they compile without errors (with gcc -Wall) and work perfectly, on the first attempt, except perhaps for typos; as you would not have the opportunity to run and "debug" them in exam conditions. (Of course, the extent to which you fail in this task just shows that you will probably not get 100% on the final exam, which you might have suspected anyway. But the ideal is first-time perfection.)
+
+These questions are mostly from different exams. They are roughly in the order in which I suggest you try them; I don't expect everyone to attempt them all. The first question was labelled "trick question" on the exam, because it is a bit quirky. But I put it first here because it encompasses a very important point.
+
+
+
+1. [4 marks] (trick question)
+a) How does the following function in C find the size of the array parameter?
+
+void f(int *p)
+{
+    ...
+}
+Answer:
+
+Well, certainly not with "sizeof p".
+Maybe the size of the array parameter is defined as part of the interface, like how the pipe() kernel call requires a parameter which is a pointer to the zeroth item of an array of two elements.
+
+Or maybe there is some other information available about the size of the item. Perhaps the size is stored in a global variable. Or it is possible for the data to indicate its own end in some way, as in part b:
+
+b) Under what circumstances would the answer to part (a) be different if the parameter were of type "char *"?
+
+Answer:
+
+If it is considered to be a string, then there should be a zero byte in the array somewhere before the end of the array, and this indicates the end of the string. It still doesn't really tell you how big the array is, e.g. if f() needed to know how much further data it could strcat() onto the end of p without exceeding the array bounds then this wouldn't help.
+(Grading note for question 10: Obviously you didn't have to write as much philosophy as above. The important points are: (a) you can't get the size of the array out of the pointer; and (b) C strings indicate their own end with the \0.)
+
+
+2. [10 marks]
+Which of the quotation marks in this shell script are unnecessary?
+
+foo &
+foopid="$!"
+while kill -0 "$foopid"
+do
+    message="`foostatus`"
+    if test "$message" = "Terminated"
+    then
+        exit 0
+    else
+        echo foo status: $message
+    fi
+done
+exit 0
+A few notes:
+
+"$!" is the process ID number of the last "background" task in sh (i.e. the most recent command invoked with a '&' after it).
+"kill -0" is being used to test whether the process still exists; signal 0 does nothing, but kill -0 will fail if the process no longer exists. So the 'while' loop is iterating for as long as the process exists.
+The hypothetical "foostatus" command yields human-readable status output such as "foo is waiting for printer #3".
+For each set of quotation marks, either explain why it is necessary (for example by giving a situation in which they would prevent an error), or explain (also very tersely) why they are not necessary.
+a) "$!"
+
+Answer: Unnecessary. The process ID is a simple number, no funny characters.
+
+b) "$foopid"
+
+Answer: Again unnecessary. We know that this has the value of a previous access to "$!", so it's going to be just a number.
+
+c) "`foostatus`"
+
+Answer: Necessary. The status may contain spaces, wildcards, anything; and we want it all to go into the variable 'message' without further interpretation.
+
+d) "$message"
+
+Answer: Necessary. Without the quotes, the message will be re-parsed, and if it contains spaces (which the example suggests it usually will), it will occupy multiple arguments to test, and test will give a syntax error.
+
+e) "Terminated"
+
+Answer: Unnecessary. All of the characters in the string are letters. The quotation marks don't do anything because there are no special characters to suppress the interpretation of.
+
+
+
+3. [6 marks] 
+Here are some "software tools" principles. For each, give an example of a unix program which obeys the rule, and state what it does or avoids doing so as to comply; and also give an example of a unix program which violates the rule, state how it violates the rule, and explain why you think it is or is not justified in doing so.
+
+Some discussion of answers to question 3 follow. There are many possible and trivial answers for programs which obey the rule; here are some answers to the harder part of the question, programs which violate the rule and whether or not this is justified.
+a) "Write small programs that do one thing well."
+
+You could argue that programs like editors or compilers violate this principle; they're certainly not small and simple. But I can't imagine a compiler which is made out of small tool-like programs; and editors like that are very annoying. Mostly, a compiler does do one focused thing, and a modern compiler typically does it well.
+
+[rewritten January 2015 because the previous answer was very dated:] 
+A good example of a program which violates this principle is a typical modern web browser. Not content to retrieve and format web pages, a typical modern web browser contains multiple embedded programming languages, and all sorts of fancy stuff. The result is that web browsers are known for being some of the buggiest software we use, and this bugginess is particularly important because they are on a security boundary (you visit untrusted web pages and they mustn't be able to execute arbitrary code on your computer), so we have constant urgent security updates.
+
+b) "Expect the output of every program to become the input to another, as yet unknown, program." (For example, don't clutter output with extraneous information such as headers.)
+
+I was expecting most students to use "ps" as an example of a program which outputs headers.
+
+The "ls -l" output could have been made easier to parse.
+
+"ls -l" and "ls -R" have extra header-like information which would make for a good answer here.
+
+Most obvious "violates" examples here are about including headers. A good example which is not about headers is "diff". The output of diff is harder to parse than it has to be.
+
+c) "Make programs' input formats easy to generate or type." (Example: Avoid stringently columnar or binary input formats. Another example: Supply good defaults: It should be common to say simply "command" with no command-line arguments.)
+
+An excellent "violates" example of this is "make"'s Makefile file format. Yucky stuff with tabs which is pointlessly tricky.
+
+
+
+4. [7 marks] 
+Sketch the inode and directory information involved in the following output from an "ls -liR" of the directory which is inode number 10. That is, list the inode numbers and what data you know is in those inodes; and state the contents of the directories involved.
+
+total 8
+12 drwxr-xr-x  3 ajr  users 4096 Feb 27 10:05 bar
+13 drwxr-xr-x  3 ajr  users 4096 Feb 27 10:05 baz
+
+./bar:
+total 8
+14 -rw-r--r--  1 ajr  users   20 Feb 27 10:06 gar
+
+./baz:
+total 8
+15 -rw-r--r--  1 ajr  users   50 Feb 27 10:06 gaz
+
+Inodes:
+
+10	D	???
+12	D	rwxr-xr-x, ajr, users, Feb 27, etc
+13	D	rwxr-xr-x, ajr, users, Feb 27, etc
+14	 	rw-r--r--, ajr, users, Feb 27, etc
+15	 	rw-r--r--, ajr, users, Feb 27, etc
+Contents:
+
+10	 . 10, .. ??, bar 12, baz 13
+12	 . 12, .. 10, gar 14
+13	 . 13, .. 10, gaz 15
+14	contents of gar file
+15	contents of gaz file
+
+
+
+5. [5 marks] 
+Here are some commands which use the "expr" tool to output the sum, difference, product, and quotient of the same two numbers:
+
+expr 2 + 3
+expr 2 - 3
+expr 2 \* 3
+expr 2 / 3
+Why is the multiplication invocation different?
+
+Because "*" indicates file name expansion in the shell and must be quoted if you want an actual "*".
+
+
+
+6. [15 marks]
+What is the output (on stdout) from the following commands? If you can't tell from the information given, state what additional information you would need.
+General solutions note: If you don't understand the supplied answer, now that you're no longer in the exam situation, please actually try the command, and experiment from there.
+
+a) test x = x
+
+Answer: no output to stdout
+
+b) expr 2 + 3 | wc -l
+
+Answer: 1
+
+c) echo hi | wc -c
+
+Answer: 3
+
+d) (echo hi; echo bye) | sort
+
+Answer: 
+bye 
+hi
+
+e) echo hi; echo bye | wc -l
+
+Answer: 
+hi 
+1
+
+f) expr 2 * 3
+
+Answer: It depends upon what files are in the current directory, because '*' is substituted accordingly. 
+(E.g. if there is only one file and it is named '+', then this command line will expand to "expr 2 + 3" and yield the output "5".)
+
+Grading: 
+Out of: 3, 2, 2, 2, 3, 3. 
+For part (f), just saying that you think the author meant expr 2 \* 3 was worth one out of 3. The question was what does happen, and this is a much harder question.
+
+
+
+
+7. [10 marks]
+
+Note in 2016: This question involves more shell programming than we did this term.
+
+The "cal" command has output like this:
+
+              May 2006
+         S  M Tu  W Th  F  S
+            1  2  3  4  5  6
+         7  8  9 10 11 12 13
+        14 15 16 17 18 19 20
+        21 22 23 24 25 26 27
+        28 29 30 31
+By default it shows the current month. The above output could also have been produced with the command "cal 5 2006" (since May is the fifth month).
+
+The 'date' command can provide these numbers when given various formats with the '+' option:
+
+        $ date +%m
+        05
+        $ date +%Y
+        2006
+        $ 
+(and "cal 05 2006" works just as well as "cal 5 2006")
+Write a shell script called "cal2" which outputs the calendar for the current month and the following month (you can ignore any command-line arguments). Note that if the current month is number 12, you have to output month #1 for next year (rather than month 13, which does not exist).
+
+month=`date +%m`
+year=`date +%Y`
+month=`expr $month + 1`
+if test $month -eq 13
+then
+    month=1
+    year=`expr $year + 1`
+fi
+
+cal
+cal $month $year
+
+
+
+8. [5 marks] 
+Write a simplified "expr" command in C. Write the entire C program, except that you can omit the #includes.
+
+Your expr should require there to be three command-line arguments, the middle of which is the string "+", "-", "*", or "/" (integer division). The other two are integers but you do not need to check this; just call atoi() or similar. Diagnose a division by zero appropriately (do not perform the division, as this may cause an "abnormal termination" similar to a segmentation fault).
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int main(int argc, char **argv)
+{
+    int b;
+
+    if (argc != 4 || strlen(argv[2]) != 1 || !strchr("+-*/", argv[2][0])) {
+	fprintf(stderr, "usage: %s number op number\n", argv[0]);
+        return(1);
+    }
+
+    switch (argv[2][0]) {
+    case '+':
+        printf("%d\n", atoi(argv[1]) + atoi(argv[3]));
+        break;
+    case '-':
+        printf("%d\n", atoi(argv[1]) - atoi(argv[3]));
+        break;
+    case '*':
+        printf("%d\n", atoi(argv[1]) * atoi(argv[3]));
+        break;
+    case '/':
+        if ((b = atoi(argv[3])) == 0) {
+            fprintf(stderr, "%s: divide by zero error\n", argv[0]);
+            return(1);
+        }
+        printf("%d\n", atoi(argv[1]) / b);
+        break;
+    }
+
+    return(0);
+}
+
+
+
+
+9. [5 marks] A programmer is writing a function to compute the number of files and directories below a certain point of the filesystem tree, similar to mydu's traversing of a filesystem subtree in assignment three. This programmer knows that "." and ".." should be avoided, but is not very familiar with strcmp() and decides to skip the check, figuring that the results will still be close.
+
+What happens?
+
+Answer:
+
+The program will go into an infinite loop by recursively opening "." in a directory and thus re-reading the directory again, and so on forever. If it ignored only ".", it would go into an infinite loop through opening ".." and reading a parent directory which includes this directory as a subdirectory and eventually reading this directory again and repeating indefinitely.
+
+
+
+10. [15 marks] Write a simplified version of 'tr' in C. Your program can be invoked in one of only two ways:
+
+"tr x y", for any single characters 'x' and 'y', changes all of the first character to the second
+"tr -d z", for any single character 'z', removes all of that character
+Like "tr", your program will operate by copying the standard input to the standard output, making appropriate changes. It will never take filename arguments.
+
+Do not use getopt(); just check for "-d" with strcmp(). In particular, "tr - x" changes all minus signs to the letter x, rather than being a usage error.
+
+Diagnose all usage errors appropriately. If something which is supposed to be a single character is not a single character, you can output "tr: argument must be a single character"; for other usage errors, you must output an appropriate usage string in the man page SYNOPSIS format.
+
+#include <stdio.h>
+#include <string.h>
+
+int main(int argc, char **argv)
+{
+    int dflag, c;
+
+    if (argc != 3) {
+        fprintf(stderr, "usage: %s {fromchar tochar | -d delchar}\n", argv[0]);
+        return(1);
+    }
+    dflag = (strcmp(argv[1], "-d") == 0);
+    if ((!dflag && strlen(argv[1]) != 1) || strlen(argv[2]) != 1) {
+        fprintf(stderr, "%s: argument must be a single character\n", argv[0]);
+        return(1);
+    }
+    if (dflag) {
+        while ((c = getchar()) != EOF)
+            if (c != argv[2][0])
+                putchar(c);
+    } else {
+        while ((c = getchar()) != EOF)
+            if (c == argv[1][0])
+                putchar(argv[2][0]);
+            else
+                putchar(c);
+    }
+    return(0);
+}
+
+
+
+11. [15 marks] Write a version of the "head" command in C. This program takes zero or more file name arguments; if there are zero file name arguments, it processes stdin. By default it copies ten lines of the input to the output, then stops reading that input file. If there are more than one file names on the command-line, just output the first ten lines of each. If a file is shorter than ten lines, that's fine, you just output all the data there is.
+
+There is also a '-n' option (not quite the same as the standard 'head' command) which changes the number of lines from ten to some other number. For example, "head -n15 file" shows the first 15 lines. Parse this option using getopt() in the standard way.
+
+An answer:
+
+#include <stdio.h>
+#include <unistd.h>
+
+int main(int argc, char **argv)
+{
+    int c, status = 0, n = 10;
+    FILE *fp;
+    extern void process(FILE *fp, int lines);
+
+    while ((c = getopt(argc, argv, "n:")) != EOF) {
+        if (c == 'n') {
+            /* (for this exam question, calling atoi() was fine) */
+            char tmp;
+            if (sscanf(optarg, "%d%c", &n, &tmp) != 1)
+                status = 1;
+        } else {
+            status = 1;
+        }
+    }
+    if (status) {
+        fprintf(stderr, "usage: %s [-n num] [file ...]\n", argv[0]);
+        return(1);
+    }
+
+    if (optind == argc) {
+        process(stdin, n);
+    } else {
+        for (; optind < argc; optind++) {
+            if ((fp = fopen(argv[optind], "r")) == NULL) {
+                perror(argv[optind]);
+                status = 1;
+            } else {
+                process(fp, n);
+                fclose(fp);
+            }
+        }
+    }
+
+    return(status);
+}
+Now for the process() function: 
+First, the way which is probably much more straightforward but has the serious disadvantage that it pointlessly stores whole lines at a time, and breaks extremely long lines thus miscounting:
+
+void process(FILE *fp, int lines)
+{
+    char buf[500];
+    for (; lines > 0 && fgets(buf, sizeof buf, fp); lines--)
+        printf("%s", buf);
+}
+Or, here is a better version which does not store whole lines and simply counts \n characters:
+
+void process(FILE *fp, int lines)
+{
+    int c;
+    while (lines > 0 && (c = getc(fp)) != EOF) {
+        putchar(c);
+        if (c == '\n')
+            lines--;
+    }
+}
+
+
+
+12. [10 marks] The C library function "system" executes a command by passing it to the shell. For example, if a C program wants to put you in the 'vi' editor on a file named "file", it could say
+
+        status = system("vi file");
+The system() function does not return until the subprocess has exited. It returns the exit status of the command as the return value of system().
+To get the shell to parse and execute this command, system() uses the '-c' option to sh. That is, the above system() call will execute the equivalent of
+
+        /bin/sh -c 'vi file'
+except, of course, that it does it via fork()/execl()/wait(). (If the fork() fails, system() returns -1.)
+Write the system() C library function. You don't have to worry about #includes. (You also don't have to worry about signals for this question -- the real system() function does something about signals which you can forget about for this exam question.)
+
+An answer:
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int system(char *cmd)
+{
+    int pid = fork();
+    if (pid < 0)
+        return(-1);
+    if (pid == 0) {
+        execl("/bin/sh", "sh", "-c", cmd, (char *)NULL);
+        perror("/bin/sh");
+        exit(127);
+    } else {
+        int status;
+        wait(&status);
+        return(status >> 8);
+    }
+}
+A few grading notes:
+
+"return(status)" was accepted for full marks; the ">> 8" is not important as far as your understanding of the material, although of course it is crucial for your program to function in real life.
+It's not extremely clear what should be done if the wait() fails.
+
+It's quite important that the child process does not return from system(). If the execl() fails, we have to call exit() (or better yet, _exit() -- see the man page if interested).
+
+
+
+13. [15 marks] The current directory contains files named "1", "2", and "3". Write a program to listen on TCP/IP port 1234, and each time there is a connection, it outputs the contents of one of these files to the connection and then closes the connection. It should output the contents of the file "1" to the first caller, "2" to the second caller, then "3", then back to "1" and continue indefinitely.
+
+The files on disk are in unix text file format, and you have to convert to the network newline convention by outputting an extra '\r' before every '\n'.
+
+An answer:
+
+#include <stdio.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+
+int main()
+{
+    int listenfd, clientfd, len;
+    struct sockaddr_in r, q;
+    static char *files[3] = { "1", "2", "3" };
+    int whichfile = 0;
+    FILE *fp;
+    int c;
+
+    if ((listenfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+        perror("socket");
+        return(1);
+    }
+
+    memset(&r, '\0', sizeof r);
+    r.sin_family = AF_INET;
+    r.sin_addr.s_addr = INADDR_ANY;
+    r.sin_port = htons(1234);
+    if (bind(listenfd, (struct sockaddr *)&r, sizeof r) < 0) {
+        perror("bind");
+        return(1);
+    }
+    if (listen(listenfd, 5)) {
+        perror("listen");
+        return(1);
+    }
+
+    while (1) {
+        len = sizeof q;
+        if ((clientfd = accept(listenfd, (struct sockaddr *)&q, &len)) < 0) {
+            perror("accept");
+            return(1);
+        }
+        if ((fp = fopen(files[whichfile], "r")) == NULL) {
+            perror(files[whichfile]);
+        } else {
+            while ((c = getc(fp)) != EOF) {
+                if (c == '\n') {
+                    write(clientfd, "\r\n", 2);
+                } else {
+                    char cc = c;
+                    write(clientfd, &cc, 1);
+                }
+            }
+            fclose(fp);
+            whichfile = (whichfile + 1) % 3;
+        }
+        close(clientfd);
+    }
+}
+Note: write()ing a single character at a time will make for a really slow program. In real life, buffering would be essential. I would use fdopen() to make a "FILE *" out of the socket (see the fdopen man page), then write to it with putchar, then fclose() it to close the socket. 
+Actually, this program is no longer -- even shorter. See below.
+
+Note 2: When we go to do the write("\r\n"), passing sizeof "\r\n" as the length parameter would be quite wrong, because that size would be 3. If you're not sure why, you should think about it and/or ask.
+
+Note 3: When we go to write the character 'c', we cannot call write(clientfd, &c, 1), because c is an int, not a char. On "big-endian" machines, in fact, this would write a zero byte every time in the above loop (again, figure out why!). We also cannot make the 'c' variable be a char. This is because getc() returns -1 for EOF, and returns 255 if there is a 255 byte read in; as an eight bit value, these are identical, which is a big problem. Alternately put, getc() can return any of the 256 possible eight-bit values OR it can return -1 for EOF; this is 257 possible values, which cannot be stored in an 8-bit variable, because eight bits can be in only 28 possible states.
+
+Here's the fdopen version, which will be faster for significantly-sized files or for a significant number of requests.
+
+(Note, however, that this strategy is not suitable for your assignment four. In the case below, the buffering isn't a problem because we're fclosing the file anyway, which flushes all buffers.)
+
+#include <stdio.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+
+int main()
+{
+    int listenfd, clientfd, len;
+    struct sockaddr_in r, q;
+    static char *files[3] = { "1", "2", "3" };
+    int whichfile = 0;
+    FILE *fp, *ofp;
+    int c;
+
+    if ((listenfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+        perror("socket");
+        return(1);
+    }
+
+    memset(&r, '\0', sizeof r);
+    r.sin_family = AF_INET;
+    r.sin_addr.s_addr = INADDR_ANY;
+    r.sin_port = htons(1234);
+    if (bind(listenfd, (struct sockaddr *)&r, sizeof r) < 0) {
+        perror("bind");
+        return(1);
+    }
+    if (listen(listenfd, 5)) {
+        perror("listen");
+        return(1);
+    }
+
+    while (1) {
+        len = sizeof q;
+        if ((clientfd = accept(listenfd, (struct sockaddr *)&q, &len)) < 0) {
+            perror("accept");
+            return(1);
+        }
+        if ((fp = fopen(files[whichfile], "r")) == NULL) {
+            perror(files[whichfile]);
+            close(clientfd);
+        } else if ((ofp = fdopen(clientfd, "w")) == NULL) {
+            fprintf(stderr, "can't allocate stdio data\n");
+            close(clientfd);
+        } else {
+            while ((c = getc(fp)) != EOF) {
+                if (c == '\n')
+                    putc('\r', ofp);
+                putc(c, ofp);
+            }
+            fclose(fp);
+            fclose(ofp);  /* which also does close(clientfd) */
+            whichfile = (whichfile + 1) % 3;
+        }
+    }
+}
+
