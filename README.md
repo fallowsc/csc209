@@ -1,5 +1,7 @@
 # csc209
 
--tutorials
+tutorials:
 
--assignments
+-code is the file
+
+commit comments are the instructions and solutions
