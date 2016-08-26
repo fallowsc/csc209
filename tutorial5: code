@@ -1,0 +1,18 @@
+Tutorial five (stat)
+
+Compilation succeeded.
+
+Basic function:
+Basic function seems correct
+
+Error tests:
+Permission-denied test unexpectedly produced stdout
+
+Usage message tests:
+Usage errors might be correct (you get the point; this is automatically graded)
+
+Grade calculation:
+0.5 out of 0.5 for basic function
+0 out of 0.2 for stat error handling
+0.3 out of 0.3 for usage checking
+Total 0.8 out of 1
