@@ -1,0 +1,15 @@
+Tutorial nine
+
+Testing your code with a substitute main() with various lists: 
+2.c: seems to work 
+3.c: seems to work 
+4.c: Segmentation violation (bad pointer dereference) 
+5.c: does not comply with assignment requirements 
+6.c: Segmentation violation (bad pointer dereference)
+Two out of two for 2.c through 4.c;
+zero out of one for 5.c;
+zero out of one for 6.c.
+
+Your tutorial nine grade is 2 out of 4. Class average was 1.86 out of 4.
+
+Note: Cases where 5.c says "does not comply with assignment requirements" are usually because you did not eliminate all special cases. The point of using the extra level of indirection is to eliminate all special cases.
