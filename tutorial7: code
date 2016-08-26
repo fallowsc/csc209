@@ -1,0 +1,63 @@
+Grades:
+
+The defects in the original code:
+You didn't fix defect: The type of 'c' must be int, not char, as discussed at https://cs.utm.utoronto.ca/~ajr/209/notes/tiny/getc.html.
+You fixed defect: The argc check should be "argc != 2" instead of "argc < 2".
+You fixed defect: Arg count error should go to stderr, not stdout.
+Defect: Should output a proper usage message rather than the silly "put a file name": Your usage message is approximately correct but lacks a terminating newline.
+You fixed defect: If argc is inappropriate, must not proceed to fopen(argv[1]).
+You fixed defect: The 'mode' argument to fopen() should be simply "r", not "r+".
+You fixed defect: If fopen() returns NULL, should call perror(argv[1]).
+You fixed defect: If fopen() returns NULL, must not proceed with getc().
+You fixed defect: 0 is a perfectly valid byte; the 'while' loop test should be "!= EOF".
+You fixed defect: The successful exit status should be 0, not 1.
+You fixed 9 out of 10 defects, which exceeds the requirement for this tutorial.
+Total:
+
+Your tutorial seven grade is 1 out of 1. Class average was 0.8 out of 1.
+
+The original code:
+
+#include <stdio.h> 
+
+int main(int argc, char **argv) 
+{ 
+    FILE *fp; 
+    char c; 
+
+    if (argc < 2) 
+        printf("put a file name"); 
+
+    fp = fopen(argv[1], "r+"); 
+    while ((c = getc(fp)) > 0) 
+        putchar(c); 
+
+    return(1); 
+}
+Your submission:
+
+
+#include <stdio.h> 
+
+int main(int argc, char **argv) 
+{ 
+        FILE *fp; 
+        char c; 
+
+        if (argc != 2) { 
+                fprintf(stderr, "usage: %s FILE", argv[0]); 
+                return(1); 
+        } 
+
+        fp = fopen(argv[1], "r"); 
+        if (fp == NULL) { 
+                perror(argv[1]); 
+                return(1); 
+        } 
+
+        while ((c = fgetc(fp)) != EOF) { 
+                putchar(c); 
+        } 
+
+        return(0); 
+}
