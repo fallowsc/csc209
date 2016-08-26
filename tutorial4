@@ -1,0 +1,11 @@
+tut4:
+
+Grade for tut4 is 0.75 out of 1. 
+Comments (mostly automated): 
+        Compiles ok. 
+        There are serious indentation problems which hinder reading your code. 
+        Your program doesn't work for 0 and/or 1, but seems to give correct results for 2 through 30 inclusive. 
+        Seems to exceed array bounds if argument is negative (this is a serious error, but no penalty this time). 
+        Usage check seems correct (if argc != 2). 
+        Usage message seems ok but is to stdout instead of stderr (no penalty this time, because we hadn't done fprintf yet). 
+        You seem to have called atoi() twice (better to call it only once; no penalty).
