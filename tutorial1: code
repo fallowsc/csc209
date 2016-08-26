@@ -1,0 +1,28 @@
+tut1a:
+
+    sed s/x/xx/
+    
+Testing with "echo I x-ray the xylophone | sh tut1a": 
+Output to stdout:
+    I xx-ray the xylophone
+Grade for tut1a is 1 out of 1.
+
+
+
+tut1b:
+
+    sed 's/\(.*\)\([0-9]\)\(.*\)/\1\2\2\3/'
+
+Testing with "echo Why was 10 afraid of 9\? | sh tut1b": 
+Output to stdout:
+    Why was 10 afraid of 99?
+Semi-automated grader comment: This duplicates the wrong digit (not the first as specified), and is overly complex. Consider how this could be made simpler by matching only the relevant part of the data -- you don't need to match the whole line. 
+Grade for tut1b is 0.75 out of 1.
+
+
+
+tut1c:
+
+You get the bonus 10% for tut1c. Adding 0.2 since the total tut1 grade is out of 2.
+
+Total grade for tutorial 1:  1.95 out of 2.
