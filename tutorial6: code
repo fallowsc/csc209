@@ -1,0 +1,22 @@
+Tutorial six (ispalindrome.c)
+
+Compiling ispalindrome.c:
+Succeeded.
+
+First, testing usage messages:
+With zero arguments:
+- exit status is 1 as expected
+- that looks like it might be a usage message (good)
+With two arguments:
+- exit status is 1 as expected
+- that looks like it might be a usage message (good)
+
+Test with string with no alphanumeric characters:
+Unexpected exit status 1 (should be 0)
+
+Now, trying your program on 24 palindromes and non-palindromes:
+Correct behaviour:
+  12 out of 12 palindromes claimed to be palindromes
+  12 out of 12 non-palindromes claimed not to be palindromes
+
+Final score for tutorial 6: 0.9 out of 1
