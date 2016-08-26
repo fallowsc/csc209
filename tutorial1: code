@@ -26,3 +26,8 @@ tut1c:
 You get the bonus 10% for tut1c. Adding 0.2 since the total tut1 grade is out of 2.
 
 Total grade for tutorial 1:  1.95 out of 2.
+
+
+
+
+(To test your expression, you could use "echo". For example, "echo *" will show you all of the file names in the current directory.)
